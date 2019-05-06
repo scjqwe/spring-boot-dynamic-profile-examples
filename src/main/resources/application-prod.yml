@@ -1,0 +1,4 @@
+redis:
+  cluster:
+    host: 127.0.0.1:6379,127.0.0.1:6380
+  password: null

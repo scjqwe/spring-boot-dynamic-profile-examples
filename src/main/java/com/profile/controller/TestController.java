@@ -2,6 +2,7 @@ package com.profile.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,7 +32,10 @@ public class TestController {
 	}
 
 	@RequestMapping("/get")
-	public String getFromdef(String key) {
+	public String get(String key) {
+		if (StringUtils.isEmpty(key)) {
+			return null;
+		}
 		return stringRedisTemplate.opsForValue().get(key);
 	}
 

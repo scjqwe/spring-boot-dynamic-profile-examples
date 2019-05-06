@@ -15,11 +15,32 @@
 	</bean>
 
 	<!-- redis单点配置 -->
-	<bean id="lettucePoolingClientConfiguration" class="org.springframework.data.redis.connection.lettuce.DefaultLettucePoolingClientConfiguration">
-		<constructor-arg name="poolConfig" ref="genericObjectPoolConfig"></constructor-arg>
-		<constructor-arg name="clientConfiguration"></constructor-arg>
-		<property name=""></property>
+	<bean id="standaloneConfig" class="org.springframework.data.redis.connection.RedisStandaloneConfiguration">
+		<property name="hostName" value="${redis.host}"></property>
+		<property name="port" value="${redis.port}"></property>
+		<property name="password">
+			<bean class="org.springframework.data.redis.connection.RedisPassword">
+				<constructor-arg name="thePassword" value="${redis.password}"></constructor-arg>
+			</bean>
+		</property>
+		<property name="database" value="${redis.database}"></property>
 	</bean>
+
+	<!-- LettuceConnectionFactory配置 -->
+	<bean id="lettuceConnectionFactory" class="org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory">
+		<constructor-arg name="standaloneConfig" ref="standaloneConfig"></constructor-arg>
+		<constructor-arg name="clientConfig" ref="lettucePoolingClientConfiguration" />
+	</bean>
+
+	<!--连接池配置 -->
+	<bean id="lettucePoolingClientConfiguration" class="org.springframework.data.redis.connection.lettuce.DefaultLettucePoolingClientConfiguration">
+		<constructor-arg name="clientConfiguration">
+			<bean id="clientConfiguration" class="org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration" factory-method="defaultConfiguration" />
+		</constructor-arg>
+		<constructor-arg name="poolConfig" ref="genericObjectPoolConfig" />
+	</bean>
+
+	<!-- Common-Pool2线程池配置 -->
 	<bean id="genericObjectPoolConfig" class="org.apache.commons.pool2.impl.GenericObjectPoolConfig">
 		<property name="maxTotal" value="100"></property>
 		<property name="maxIdle" value="100"></property>
@@ -33,8 +54,5 @@
 		<property name="testWhileIdle" value="true"></property>
 	</bean>
 
-	<bean id="lettuceConnectionFactory" class="org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory">
-		<constructor-arg name="clientConfig" ref="lettucePoolingClientConfiguration" />
-	</bean>
 </beans>
 
